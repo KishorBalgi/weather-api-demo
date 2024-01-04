@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      #result {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Weather App</h2>
+
+    <form id="weatherForm">
+      <label for="cityInput">Enter city names (comma-separated):</label>
+      <input type="text" id="cityInput" name="cities" required />
+      <button type="button" onclick="getWeather()">Get Weather</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+      function getWeather() {
+        const cityInput = document.getElementById("cityInput").value;
+        const cities = cityInput.split(",").map((city) => city.trim());
+
+        fetch("/getWeather", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ cities }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const resultDiv = document.getElementById("result");
+            // data is an array of objects with fields city and weather
+            // weather has followinf fields: temp, feels_like, temp_min, temp_max, pressure, humidity
+            resultDiv.innerHTML = "";
+            data.forEach((item) => {
+              const cityDiv = document.createElement("div");
+              cityDiv.innerHTML = `<h3 style="color:red">${item.city}</h3>
+              <p>Temperature: ${item.weather.temp}C</p>
+              <p>Feels like: ${item.weather.feels_like}</p>
+              <p>Min temperature: ${item.weather.temp_min}C</p>
+              <p>Max temperature: ${item.weather.temp_max}C</p>
+              <p>Pressure: ${item.weather.pressure}</p>
+              <p>Humidity: ${item.weather.humidity}</p>`;
+              resultDiv.appendChild(cityDiv);
+            });
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+  </body>
+</html>

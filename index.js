@@ -5,14 +5,18 @@ dotenv.config();
 
 const weatherRouter = require("./routes/weather");
 
+app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// app.use("/", (req, res, next) => {
+//   res.sendFile(__dirname + "/views/index.html");
+// });
 app.use("/", weatherRouter);
 
 // Error handling:
 app.use((err, req, res, next) => {
-  res.status(500).send({ error: err.message });
+  res.status(err.status || 500).send({ error: err.message });
 });
 
 app.listen(process.env.PORT || 3000, () => {
